@@ -1,4 +1,4 @@
-plog-izzy
+plog-izzi
 =========
 
-College project for Logic Programming. Consists on using restriction logic for solving a puzzle named Izzy.
+College project for Logic Programming. Consists on using restriction logic for solving a puzzle named Izzi.
