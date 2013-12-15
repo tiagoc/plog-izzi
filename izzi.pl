@@ -121,19 +121,81 @@ print_board(Board):-
         nl,
         process_print_board(Board, 8, NumberOfLines). %Since the board is square LineLenght and NumberOfLines is equal
         
+% Creates a custom tile with given constraints
+% create_custom_tile([Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color])
+% create_custom_tile([0,_,_,_,1,_,_,_]).
+create_custom_tile(Tile, [Triangle1color, _, _, _, Triangle5color, _, _, _]):-
+        Triangle2color in 0..1,
+        Triangle3color in 0..1,
+        Triangle4color in 0..1,
+        Triangle6color in 0..1,
+        Triangle7color in 0..1,
+        Triangle8color in 0..1,
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
+        valid_tile(Tile, _IsValid);
+        create_custom_tile(Tile, [Triangle1color, _, _, _, Triangle5color, _, _, _]).
+create_custom_tile(Tile, [_, Triangle2color, Triangle3color, _, _, _, _, _]):-
+        Triangle1color in 0..1,
+        Triangle4color in 0..1,
+        Triangle5color in 0..1,
+        Triangle6color in 0..1,
+        Triangle7color in 0..1,
+        Triangle8color in 0..1,
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
+        valid_tile(Tile, _IsValid);
+        create_custom_tile(Tile, [_, Triangle2color, Triangle3color, _, _, _, _, _]).
+create_custom_tile(Tile, [_, _, _, Triangle4color, _, _, _, Triangle8color]):-
+        Triangle1color in 0..1,
+        Triangle2color in 0..1,
+        Triangle3color in 0..1,
+        Triangle5color in 0..1,
+        Triangle6color in 0..1,
+        Triangle7color in 0..1,
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
+        valid_tile(Tile, _IsValid);
+        create_custom_tile(Tile, [_, _, _, Triangle4color, _, _, _, Triangle8color]).
+create_custom_tile(Tile, [_, _, _, _, _, Triangle6color, Triangle7color, _]):-
+        Triangle1color in 0..1,
+        Triangle2color in 0..1,
+        Triangle3color in 0..1,
+        Triangle4color in 0..1,
+        Triangle5color in 0..1,
+        Triangle8color in 0..1,
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
+        valid_tile(Tile, _IsValid);
+        create_custom_tile(Tile, [_, _, _, _, _, Triangle6color, Triangle7color, _]).
+
+%generate_first_line(FirstLine,[0,0,1,0,1,1,0,1],8, []), print_board_line(FirstLine,[],1).
+generate_first_line(FirstLine, _, 0, Temp):- FirstLine=Temp.
+generate_first_line(FirstLine,
+                    [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
+                    N, Temp):-
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
+        append(Temp, [Tile], NewTemp),
+        Tile2Triangle1color#=Triangle4color,
+        Tile2Triangle5color#=Triangle8color,
+        create_custom_tile(Tile2, [Tile2Triangle1color, _, _, _, Tile2Triangle5color, _, _, _]),        
+        append(Temp, [Tile2], NewTemp), 
+        NewN is N-1,
+        generate_first_line(FirstLine, Tile2, NewN, NewTemp).
+
 
 % ***************************************************************************
 % *                              Main cicle                                 *                      
 % ***************************************************************************
 
 izzi:-
-        nl
+        
+        %exactly(Tile,Board,1),
+        %labeling([],FirstLine),
+        %element(?X,+List,?Y),
         
         
-        
+        nl    
         .
-        
-
+       
+          
+             
 % ***************************************************************************
 % *                   Utilities for list management                         *                      
 % ***************************************************************************
@@ -143,6 +205,13 @@ izzi:-
 split(Tail,TempList,Tail,N,N,TempList).
 split([H|T], Output1, Output2, N, Counter, TempList):- 
                 C is Counter+1, append(TempList,[H],NewTempList), split(T,Output1,Output2,N,C,NewTempList),!.
+
+% Checks if all the elements of a list are different
+% alldif(List).
+alldif([]).
+alldif([E|Es]) :-
+   maplist(dif(E), Es),
+   alldif(Es).
 
 
 
