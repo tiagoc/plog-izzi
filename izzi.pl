@@ -53,13 +53,12 @@ create_tile(Tile):-
 % Creates a board with N valid tiles. The default board has 64 different tiles, if a bigger board is generated there will be dupplicates
 % load_tiles(-Board, +N, +TempBoard)
 % load_tiles(Board, 64, []).
-load_tiles(Board, 0, TempBoard):-Board=TempBoard.
+load_tiles(Board, 0, TempBoard):- Board=TempBoard.
 load_tiles(Board, N, TempBoard):-
         NewN is N-1,
         create_tile(NewTile),
         append(TempBoard, [NewTile], NewBoard),
         load_tiles(Board, NewN, NewBoard).
-
 
 % Prints a single tile
 % print_tile(+Tile)
@@ -77,6 +76,52 @@ print_tile([Triangle1color, Triangle2color, Triangle3color, Triangle4color, Tria
         write('\\'), write(Triangle8color),
         write('|').
 
+% Prints a line from the board
+% print_board_line(+BoardLine,+ListOfSecondLines,+Mode)
+% print_board_line([0,0,1,0,1,1,0,1],[],1).
+print_board_line([],[],2):-nl.
+print_board_line([], SecondLine, 1):-
+        nl,
+        print_board_line([], SecondLine, 2).
+print_board_line([], [[Triangle5color, Triangle6color, Triangle7color, Triangle8color]|Tail],2):-
+        write('|'), write(Triangle5color),
+        write('/'), write(Triangle6color),
+        write('|'), write(Triangle7color),
+        write('\\'), write(Triangle8color),
+        write('| '),
+        print_board_line([], Tail,2).
+print_board_line([[Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color]|Tail], SecondLine, 1):-
+        write('|'), write(Triangle1color),
+        write('\\'), write(Triangle2color),
+        write('|'), write(Triangle3color),
+        write('/'), write(Triangle4color),
+        write('| '),
+        SecondLineTile=[Triangle5color, Triangle6color, Triangle7color, Triangle8color],
+        append(SecondLine, [SecondLineTile], NewSecondLine),
+        print_board_line(Tail, NewSecondLine, 1).
+
+% Processes the board for printing
+% process_print_board(+Board, +LineLength, +NumberOfLines)
+% process_print_board(Board, 8, 8)
+process_print_board([], _LineLength, _NumberOfLines).
+process_print_board(Board, LineLength, NumberOfLines):-
+        NewNumberOfLines is NumberOfLines-1,
+        split(Board, Line, RestOfLines, LineLength, 0, []),
+        print_board_line(Line, [], 1),
+        nl,
+        process_print_board(RestOfLines, LineLength, NewNumberOfLines).
+
+% Prints the board
+% print_board(+Board)
+% print_board(Board).
+print_board(Board):-
+        length(Board, BoardLength),
+        LineLength is round(sqrt(BoardLength)),
+        NumberOfLines=LineLength,
+        nl,
+        process_print_board(Board, 8, NumberOfLines). %Since the board is square LineLenght and NumberOfLines is equal
+        
+
 % ***************************************************************************
 % *                              Main cicle                                 *                      
 % ***************************************************************************
@@ -87,3 +132,20 @@ izzi:-
         
         
         .
+        
+
+% ***************************************************************************
+% *                   Utilities for list management                         *                      
+% ***************************************************************************
+
+% Split a list in two, where N is the middle
+% split(+List, -LeftList, -RigthList, +N, +Starter, +TempList). 
+split(Tail,TempList,Tail,N,N,TempList).
+split([H|T], Output1, Output2, N, Counter, TempList):- 
+                C is Counter+1, append(TempList,[H],NewTempList), split(T,Output1,Output2,N,C,NewTempList),!.
+
+
+
+% ***************************************************************************
+% *                            EndOfFile                                    *                      
+% ***************************************************************************
