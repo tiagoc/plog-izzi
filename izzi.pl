@@ -46,9 +46,13 @@ create_tile(Tile):-
         Triangle6color in 0..1,
         Triangle7color in 0..1,
         Triangle8color in 0..1,
+        valid_tile([Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color], Result),
+        Result #= 0,
+        labeling([],[Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color]),
         Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
-        valid_tile(Tile, _IsValid);
-        create_tile(Tile).
+        write(Tile).
+        %valid_tile(Tile, IsValid);
+        %create_tile(_NewTile).
  
 % Creates a board with N valid tiles. The default board has 64 different tiles, if a bigger board is generated there will be dupplicates
 % load_tiles(-Board, +N, +TempBoard)
@@ -190,11 +194,41 @@ izzi:-
         %labeling([],FirstLine),
         %element(?X,+List,?Y),
         
-        
         nl    
-        .
-       
-          
+        .    
+
+% Start Menu
+% izzi(+Mode)
+% izzi(0).
+izzi(0):-
+        write('Izzi'), nl, nl,
+        write('* Menu *'),nl,
+        write('1 - Load valid tiles'), nl,
+        write('2 - Solve puzzle'),nl,nl,
+        write('3 - Exit'), nl, nl,
+        write('Your option: '),
+        read(Option), 
+        valid_menu_option(Option, 3, ValidOption),
+        izzi(ValidOption).
+start(1):-
+     compile('tiles.pl'),
+     write('Tiles loaded').
+start(2):-
+      load_tiles(Board, 64, []),
+      print_board(Board),
+      izzi(0).
+start(3).
+
+% Checks if the option is valid
+% valid_menu_option(Option, NumberOfOptions, ValidOption)
+% valid_menu_option(1, 5, ValidOption).
+valid_menu_option(Option, NumberOfOptions, ValidOption):-
+        Option>0, Option=<NumberOfOptions,
+                ValidOption=Option;
+                write('Invalid option. Please choose a number between 1 and '), write(NumberOfOptions), write(' : '),
+                read(NewOption),
+                valid_menu_option(NewOption, NumberOfOptions, ValidOption).
+
              
 % ***************************************************************************
 % *                   Utilities for list management                         *                      
