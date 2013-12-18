@@ -49,10 +49,7 @@ create_tile(Tile):-
         valid_tile([Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color], Result),
         Result #= 0,
         labeling([],[Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color]),
-        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
-        write(Tile).
-        %valid_tile(Tile, IsValid);
-        %create_tile(_NewTile).
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color].
  
 % Creates a board with N valid tiles. The default board has 64 different tiles, if a bigger board is generated there will be dupplicates
 % load_tiles(-Board, +N, +TempBoard)
@@ -135,9 +132,10 @@ create_custom_tile(Tile, [Triangle1color, _, _, _, Triangle5color, _, _, _]):-
         Triangle6color in 0..1,
         Triangle7color in 0..1,
         Triangle8color in 0..1,
-        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
-        valid_tile(Tile, _IsValid);
-        create_custom_tile(Tile, [Triangle1color, _, _, _, Triangle5color, _, _, _]).
+        valid_tile([Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color], Result),
+        Result #= 0,
+        labeling([],[Triangle2color, Triangle3color, Triangle4color, Triangle6color, Triangle7color, Triangle8color]),
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color].
 create_custom_tile(Tile, [_, Triangle2color, Triangle3color, _, _, _, _, _]):-
         Triangle1color in 0..1,
         Triangle4color in 0..1,
@@ -145,9 +143,10 @@ create_custom_tile(Tile, [_, Triangle2color, Triangle3color, _, _, _, _, _]):-
         Triangle6color in 0..1,
         Triangle7color in 0..1,
         Triangle8color in 0..1,
-        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
-        valid_tile(Tile, _IsValid);
-        create_custom_tile(Tile, [_, Triangle2color, Triangle3color, _, _, _, _, _]).
+        valid_tile([Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color], Result),
+        Result #= 0,
+        labeling([],[Triangle1color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color]),
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color].
 create_custom_tile(Tile, [_, _, _, Triangle4color, _, _, _, Triangle8color]):-
         Triangle1color in 0..1,
         Triangle2color in 0..1,
@@ -155,9 +154,10 @@ create_custom_tile(Tile, [_, _, _, Triangle4color, _, _, _, Triangle8color]):-
         Triangle5color in 0..1,
         Triangle6color in 0..1,
         Triangle7color in 0..1,
-        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
-        valid_tile(Tile, _IsValid);
-        create_custom_tile(Tile, [_, _, _, Triangle4color, _, _, _, Triangle8color]).
+        valid_tile([Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color], Result),
+        Result #= 0,
+        labeling([],[Triangle1color, Triangle2color, Triangle3color, Triangle5color, Triangle6color, Triangle7color]),
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color].
 create_custom_tile(Tile, [_, _, _, _, _, Triangle6color, Triangle7color, _]):-
         Triangle1color in 0..1,
         Triangle2color in 0..1,
@@ -165,11 +165,12 @@ create_custom_tile(Tile, [_, _, _, _, _, Triangle6color, Triangle7color, _]):-
         Triangle4color in 0..1,
         Triangle5color in 0..1,
         Triangle8color in 0..1,
-        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
-        valid_tile(Tile, _IsValid);
-        create_custom_tile(Tile, [_, _, _, _, _, Triangle6color, Triangle7color, _]).
+        valid_tile([Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color], Result),
+        Result #= 0,
+        labeling([],[Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle8color]),
+        Tile = [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color].
 
-%generate_first_line(FirstLine,[0,0,1,0,1,1,0,1],8, []), print_board_line(FirstLine,[],1).
+% generate_first_line(FirstLine,[0,0,1,0,1,1,0,1],8, []), print_board_line(FirstLine,[],1).
 generate_first_line(FirstLine, _, 0, Temp):- FirstLine=Temp.
 generate_first_line(FirstLine,
                     [Triangle1color, Triangle2color, Triangle3color, Triangle4color, Triangle5color, Triangle6color, Triangle7color, Triangle8color],
@@ -187,6 +188,101 @@ generate_first_line(FirstLine,
 % ***************************************************************************
 % *                              Main cicle                                 *                      
 % ***************************************************************************
+
+
+% Generates a tile that will fit on the surrounding tiles
+% next_tile(+LeftTile, +UpTile, -NextTile, +Row, +Column)
+next_tile([Tile1tri1, Tile1tri2, Tile1tri3, Tile1tri4, Tile1tri5, Tile1tri6, Tile1tri7, Tile1tri8],
+          [Tile2tri1, Tile2tri2, Tile2tri3, Tile2tri4, Tile2tri5, Tile2tri6, Tile2tri7, Tile2tri8],
+          [Tile3tri1, Tile3tri2, Tile3tri3, Tile3tri4, Tile3tri5, Tile3tri6, Tile3tri7, Tile3tri8], Row, Column):-
+        
+        (
+                Row =:= 1 
+                        ->      Tile3tri1 #= Tile1tri4,
+                                Tile3tri5 #= Tile1tri8;
+                
+                Column =:= 1
+                        ->      Tile3tri2 #= Tile2tri6,
+                                Tile3tri3 #= Tile2tri7;
+                
+                Tile3tri1 #= Tile1tri4,
+                Tile3tri5 #= Tile1tri8,
+                Tile3tri2 #= Tile2tri6,
+                Tile3tri3 #= Tile2tri7
+        ), 
+        
+
+        valid_tile([Tile3tri1, Tile3tri2, Tile3tri3, Tile3tri4, Tile3tri5, Tile3tri6, Tile3tri7, Tile3tri8], Result),
+        
+        Result#=0,
+        
+        alldif([[Tile1tri1, Tile1tri2, Tile1tri3, Tile1tri4, Tile1tri5, Tile1tri6, Tile1tri7, Tile1tri8],
+                [Tile2tri1, Tile2tri2, Tile2tri3, Tile2tri4, Tile2tri5, Tile2tri6, Tile2tri7, Tile2tri8],
+                [Tile3tri1, Tile3tri2, Tile3tri3, Tile3tri4, Tile3tri5, Tile3tri6, Tile3tri7, Tile3tri8]]),
+        
+        labeling([],[Tile3tri1, Tile3tri2, Tile3tri3, Tile3tri4, Tile3tri5, Tile3tri6, Tile3tri7, Tile3tri8]),
+        nl.
+
+% Solves the board
+% solve_izzi(-Board, +PrevTileLeft, +PrevTileUp, +N, +Size)
+% solve_izzi(Board, 62).
+solve_izzi(Board, N):-        
+        create_tile(Tile),
+        append(Board, [Tile], NewBoard),
+        solve_izzi(NewBoard, Tile, _, 2, N),
+        nl.
+solve_izzi(Board, _, _, 64, 0):-
+        alldif(Board),
+        labeling([], Board).
+solve_izzi(Board, PrevTileLeft, PrevTileUp, N, Size):-        
+        
+        (
+                N<9 ->  Column is N;
+                N=:= 16 -> Column is 8;
+                N=:= 24 -> Column is 8;
+                N=:= 32 -> Column is 8;
+                N=:= 40 -> Column is 8;
+                N=:= 48 -> Column is 8;
+                N=:= 56 -> Column is 8;
+                N=:= 64 -> Column is 8;
+                
+                Column is N-(truncate(N/8))*8
+        ),
+        (
+           Column =:= 8 -> Row is truncate(N/8);
+           
+           Row is truncate(N/8)+1  
+        ),
+        
+        
+        next_tile(PrevTileLeft, PrevTileUp, NextTile, Row, Column),
+        append(Board, [NextTile], NewBoard),
+        
+        write(N),nl,write(Row),nl,write(Column),nl,write(Size),nl,
+        
+        NewSize is Size-1,
+        NewN is N+1,
+        
+        (
+           Column =:= 1 -> 
+                        Index is N-8,
+                        nthElement(NewBoard, Index, NewPrevTileUp, 0),
+                        solve_izzi(NewBoard, _, NewPrevTileUp, NewN, NewSize);
+           Row =:= 1 ->
+                        NewPrevTileLeft = NextTile,
+                        solve_izzi(NewBoard, NewPrevTileLeft, _, NewN, NewSize);
+           
+           Index is N-8,
+           nthElement(NewBoard, Index, NewPrevTileUp, 0),   
+           NewPrevTileLeft = NextTile
+        ),
+        
+        solve_izzi(NewBoard, NewPrevTileLeft, NewPrevTileUp, NewN, NewSize),
+        
+        nl.
+
+
+
 
 izzi:-
         
@@ -247,6 +343,12 @@ alldif([E|Es]) :-
    maplist(dif(E), Es),
    alldif(Es).
 
+% Find the nth element of a list
+% nthElement(+List, +Index, -Content, +StartingAt).
+nthElement([Head|_], N, Head, N).
+nthElement([_|Tail], N, Content, Counter):-
+        NewCounter is Counter + 1,
+        nthElement(Tail,N,Content, NewCounter),!.
 
 
 % ***************************************************************************
